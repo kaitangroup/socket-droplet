@@ -103,6 +103,20 @@ io.on("connection", (socket) => {
   if (count >= 2 && !roomState.startedAt) {
     roomState.startedAt = Date.now();
 
+    const appointmentId = room.split("--")[1];
+
+    // 🔷 Call WordPress API (ONLY ONCE)
+    fetch("https://authorsback.rolandjones.com/wp-json/custom/v1/meeting-start", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        appointment_id: appointmentId,
+        started_at: new Date().toISOString()
+      }),
+    }).catch(console.error);
+
     io.to(room).emit("timer-start", {
       startedAt: roomState.startedAt,
       duration: roomState.duration,
